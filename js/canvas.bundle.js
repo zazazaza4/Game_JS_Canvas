@@ -179,11 +179,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 console.log(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
 var game = document.querySelector(".game__area");
 var root = game.getContext("2d");
+var score = document.querySelector(".score");
 game.width = 1024; //window.innerWidth
 
 game.height = 576; //window.innerHeight
 
-var gravite = .45;
+var gravite = .6;
 
 var Hero = /*#__PURE__*/function () {
   function Hero() {
@@ -200,6 +201,11 @@ var Hero = /*#__PURE__*/function () {
     this.velocity = {
       x: 0,
       y: 1
+    };
+    this.jump = {
+      count: 0,
+      length: 12,
+      height: 0
     };
     this.speed = 5;
     this.frame = 0;
@@ -286,7 +292,7 @@ var Hero = /*#__PURE__*/function () {
       }
 
       this.draw();
-      this.position.y += this.velocity.y;
+      this.position.y += this.velocity.y - this.jump.height;
       this.position.x += this.velocity.x;
       this.collisionDown();
     }
@@ -537,10 +543,24 @@ function animation() {
       hero.velocity.y = 0;
     }
   }); //jump
-  //You win
+
+  if (keys.jump.pressed) {
+    hero.jump.count++;
+    console.log(hero.jump.count);
+    hero.jump.height = 2 * hero.jump.length - gravite * hero.jump.count;
+
+    if (hero.jump.count > hero.jump.length) {
+      keys.jump.pressed = false;
+      hero.jump.count = 0;
+      hero.jump.height = 0;
+    }
+  }
+
+  score.innerHTML = (scrollOffset / 50).toFixed(0); //You win
 
   if (scrollOffset > 3630) {
     console.log("you win");
+    score.innerHTML = "You won";
   } //you lose
 
 
@@ -565,7 +585,6 @@ document.addEventListener('keydown', function (_ref3) {
     case 38:
     case 87:
       console.log("up");
-      hero.velocity.y -= 12;
       keys.jump.pressed = true;
       break;
 
